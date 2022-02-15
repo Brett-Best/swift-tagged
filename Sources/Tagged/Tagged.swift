@@ -76,14 +76,22 @@ extension Tagged: Decodable where RawValue: Decodable {
 
 extension Tagged: Encodable where RawValue: Encodable {
   public func encode(to encoder: Encoder) throws {
+    do {
       var container = encoder.singleValueContainer()
       try container.encode(self.rawValue)
+    } catch {
+      try self.rawValue.encode(to: encoder)
+    }
   }
 }
 
 extension Tagged: Equatable where RawValue: Equatable {}
 
 extension Tagged: Error where RawValue: Error {}
+
+#if canImport(_Concurrency) && compiler(>=5.5.2)
+extension Tagged: Sendable where RawValue: Sendable {}
+#endif
 
 #if canImport(Foundation)
 import Foundation
